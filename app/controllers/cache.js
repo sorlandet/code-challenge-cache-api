@@ -20,7 +20,9 @@ const log = new(winston.Logger)({
 });
 
 
-let cache = new Cache();
+const cache = new Cache();
+
+cache.initialization();
 
 
 const list = function (req, res, next) {

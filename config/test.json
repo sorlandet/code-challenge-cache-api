@@ -1,0 +1,11 @@
+{
+  "caching": {
+    "db": {
+      "name": "CodeChallengeCacheTest"
+    },
+    "options": {
+      "maxSize": 5,
+      "ttl": 30
+    }
+  }
+}

@@ -30,9 +30,27 @@ class Cache {
 
     this.maxSize = this.config.options.maxSize;
 
+
+  }
+
+  getDB () {
+    const options = this.config.db;
+    const serverHost = options.host;
+    const serverPort = options.port;
+    const serverOptions = {
+      connectTimeoutMS: options.connectTimeoutMS,
+      socketTimeoutMS: options.socketTimeoutMS
+    };
+    const databaseName = options.name;
+
+    let topology = new Server(serverHost, serverPort, serverOptions);
+    return new Db(databaseName, topology, { safe: false });
+  }
+
+  initialization () {
     let that = this;
 
-    let db = this.getDB(this.config.db);
+    let db = this.getDB();
 
     db.open((err, db) => {
       if (err) {
@@ -46,19 +64,6 @@ class Cache {
         })
       }
     });
-  }
-
-  getDB (options) {
-    const serverHost = options.host;
-    const serverPort = options.port;
-    const serverOptions = {
-      connectTimeoutMS: options.connectTimeoutMS,
-      socketTimeoutMS: options.socketTimeoutMS
-    };
-    const databaseName = options.name;
-
-    let topology = new Server(serverHost, serverPort, serverOptions);
-    return new Db(databaseName, topology, { safe: false });
   }
 
   /**
@@ -136,7 +141,7 @@ class Cache {
     };
 
     let size = this.maxSize;
-    let db = this.getDB(this.config.db);
+    let db = this.getDB();
     let that = this;
 
     db.open(function (err, db) {

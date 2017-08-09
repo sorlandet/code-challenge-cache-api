@@ -14,6 +14,7 @@
   },
   "homepage": "https://github.com/sorlandet/code-challenge-cache-api#readme",
   "dependencies": {
+    "async": "^2.1.5",
     "body-parser": "^1.17.2",
     "config": "^1.26.1",
     "debug": "^3.0.0",
@@ -28,6 +29,6 @@
     "mocha": "^3.5.0"
   },
   "scripts": {
-    "test": "NODE_ENV=dev-test mocha -r ./test/specHelper.js -R spec test/unit/**/*-spec.js"
+    "test": "NODE_ENV=test mocha -r ./test/specHelper.js -R spec test/unit/**/*-spec.js"
   }
 }

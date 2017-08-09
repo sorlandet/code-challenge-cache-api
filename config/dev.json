@@ -1,6 +1,8 @@
 {
-  "cachingParams": {
-    "maxSize": 10,
-    "ttl": 60
+  "caching": {
+    "options": {
+      "maxSize": 10,
+      "ttl": 60
+    }
   }
 }
