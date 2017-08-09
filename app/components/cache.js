@@ -54,7 +54,7 @@ class Cache {
 
     db.open((err, db) => {
       if (err) {
-        log.error('Open the database: {0} cause an error: {1}'.format(databaseName, err));
+        log.error(`Open the database: ${that.config.db.name} cause an error: ${err}`);
       } else {
         that.initCollection(that.name, that.getCappedCollectionSize(), that.maxSize, db, function (err, res) {
           if (err) { log.error(err) }
@@ -121,25 +121,30 @@ class Cache {
     })
   }
 
+  /**
+   * An endpoint that returns all stored keys in the cache
+   * @param callback
+   */
   list(callback) {
     /**
-     * Find chunks
+     * Find keys
      *
-     * @param {object} collection -
+     * @param {object} collection - MongoDB Collection instance
      * @param {object} options -
      * @param {function} callback -
      */
-    const findChunks = function (collection, options, callback) {
+    const findKeys = function (collection, options, callback) {
       // on a capped collection with no ordering specified,
       // MongoDB guarantees that the ordering of results is the same as the insertion order.
 
       let query = {};
-      let fields = {};
+      let fields = { key: 1 };
 
       collection.find(query, fields, options, callback);
 
     };
 
+    // todo: need to add pagination later...
     let size = this.maxSize;
     let db = this.getDB();
     let that = this;
@@ -148,21 +153,60 @@ class Cache {
 
       if (err) {
         debug(err);
-        log.error('Open the database: {0} cause an error: {1}'.format(databaseName, err));
+        log.error(`Open the database: ${that.config.db.name} cause an error: ${err}`);
       } else {
-        findChunks(db.collection(that.name), { limit: size, sort: { $natural: 1 } }, function (err, cursor) {
+        findKeys(db.collection(that.name), { limit: size, sort: { $natural: 1 } }, function (err, cursor) {
 
           if (err) {
             callback(err)
           }
 
           cursor.toArray(function (err, docs) {
-            callback(null, {collection: that.name, documents: docs})
+            callback(null, _(docs).pluck('key').value())
           });
 
         });
       }
     })
+  }
+
+  /**
+   * An endpoint that creates/updates the data for a given key
+   * @param doc {object} - document containg given key and data
+   * @param callback
+   */
+  set(doc, callback) {
+
+    /**
+     * Update cache document
+     *
+     * @param {object} collection - MongoDB Collection instance
+     * @param {object} doc - the replacement object (document)
+     * @param {function} callback - function with (err, result) arguments
+     */
+    const updateCache = function(collection, doc, callback) {
+
+      let selector = { key: doc.key };
+      let options = { upsert: true, w: 1 };
+
+      doc['lastModified'] = new Date(); // to reflect last modification date
+
+      collection.updateOne(selector, doc, options, callback)
+    };
+
+
+    let db = this.getDB();
+    let that = this;
+
+    db.open(function (err, db) {
+
+      if (err) {
+        debug(err);
+        log.error(`Open the database: ${that.config.db.name} cause an error: ${err}`);
+      } else {
+        updateCache(db.collection(that.name), doc, callback);
+      }
+    });
   }
 }
 
