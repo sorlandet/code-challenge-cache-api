@@ -1,6 +1,6 @@
 {
   "cachingParams": {
-    "numberOfEntries": 10,
+    "maxSize": 10,
     "ttl": 60
   }
 }

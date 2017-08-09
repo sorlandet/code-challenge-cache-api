@@ -1,11 +1,16 @@
 {
-  "cachingDb": {
-    "server": "127.0.0.1",
-    "port": 27017,
-    "useAuth": false
-  },
-  "cachingParams": {
-    "numberOfEntries": 100000,
-    "ttl": 3600
+  "port": 9000,
+  "caching": {
+    "db": {
+      "host": "127.0.0.1",
+      "port": 27017,
+      "name": "CodeChallengeCache",
+      "connectTimeoutMS": 300,
+      "socketTimeoutMS": 300
+    },
+    "options": {
+      "maxSize": 100000,
+      "ttl": 3600
+    }
   }
 }
