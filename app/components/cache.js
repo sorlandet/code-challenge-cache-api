@@ -96,7 +96,7 @@ class Cache {
 
       debug('current collections', collections);
 
-      let options = {capped: true, size: size, max: max};
+      let options = { capped: false, size: size, max: max };
 
       if (!_.contains(collections, name)) {
 
@@ -122,7 +122,7 @@ class Cache {
   }
 
   /**
-   * An endpoint that returns all stored keys in the cache
+   * Returns all stored keys in the cache
    * @param callback
    */
   list(callback) {
@@ -171,7 +171,7 @@ class Cache {
   }
 
   /**
-   * An endpoint that creates/updates the data for a given key
+   * Creates/updates the data for a given key
    * @param doc {object} - document containg given key and data
    * @param callback
    */
@@ -207,6 +207,51 @@ class Cache {
         updateCache(db.collection(that.name), doc, callback);
       }
     });
+  }
+
+  /**
+   * Removes a given key from the cache
+   * @param key
+   * @param callback
+   */
+  deleteKey (key, callback) {
+
+    let db = this.getDB();
+    let that = this;
+
+    db.open(function (err, db) {
+
+      if (err) {
+        debug(err);
+        log.error(`Open the database: ${that.config.db.name} cause an error: ${err}`);
+      } else {
+        let filter = { 'key': key };
+        let options = null;
+        db.collection(that.name)
+          .deleteOne(filter, options, callback)
+      }
+    });
+
+  }
+
+  /**
+   * Removes all keys from the cache
+   */
+  deleteAll () {
+
+    let db = this.getDB();
+    let that = this;
+
+    db.open(function (err, db) {
+
+      if (err) {
+        debug(err);
+        log.error(`Open the database: ${that.config.db.name} cause an error: ${err}`);
+      } else {
+        return db.collection(that.name).deleteMany({})
+      }
+    });
+
   }
 }
 
