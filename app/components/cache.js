@@ -6,20 +6,6 @@ const debug = require('debug')('cache');
 const Server = require('mongodb').Server;
 const Db = require('mongodb').Db;
 
-const winston = require('winston');
-
-const log = new(winston.Logger)({
-  transports: [
-    new (winston.transports.File)({
-      name: 'pixel',
-      filename: __dirname + '/logs/cache.log',
-      level: 'verbose',
-      timestamp: true,
-      humanReadableUnhandledException: true
-    })
-  ]
-});
-
 
 class Cache {
   constructor(options) {
@@ -252,6 +238,63 @@ class Cache {
       }
     });
 
+  }
+
+  /**
+   * Returns the cached data for a given key
+   * @param key
+   * @param callback
+   */
+  getKey (key, callback) {
+
+    /**
+     * Generate random string
+     * @param length
+     * @return {string}
+     */
+    function randomString(length) {
+      return Math.round((Math.pow(36, length + 1) - Math.random() * Math.pow(36, length))).toString(36).slice(1);
+    }
+
+    let db = this.getDB();
+    let that = this;
+
+    db.open(function (err, db) {
+
+      if (err) {
+        debug(err);
+        log.error(`Open the database: ${that.config.db.name} cause an error: ${err}`);
+      } else {
+        let filter = { 'key': key };
+        let options = { fields: { lastModified: 0 } };
+        db.collection(that.name)
+          .findOne(filter, options, function (err, doc) {
+            if (_.isNull(doc)) {
+              log.info(`Cache miss for key ${key}`);
+              const newDoc = {
+                key: key,
+                value: randomString(32)
+              };
+
+              that.set(newDoc, function (err, response) {
+                if (err) {
+                  callback(err)
+                }
+
+                if (response.result.ok === 1 && response.result.upserted) {
+
+                  callback(null, newDoc.value)
+                } else {
+                  callback(response)
+                }
+              })
+            } else {
+              log.info(`Cache hit for key ${key}`);
+              callback(null, doc.value)
+            }
+          })
+      }
+    });
   }
 }
 

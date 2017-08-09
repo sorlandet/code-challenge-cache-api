@@ -3,22 +3,8 @@
 const _ = require('lodash');
 const config = require('config');
 const debug = require('debug')('cache-ctrl');
-const winston = require('winston');
 
 const Cache = require('../components/cache').Cache;
-
-const log = new(winston.Logger)({
-  transports: [
-    new (winston.transports.File)({
-      name: 'pixel',
-      filename: __dirname + '/logs/cache.log',
-      level: 'verbose',
-      timestamp: true,
-      humanReadableUnhandledException: true
-    })
-  ]
-});
-
 
 const cache = new Cache();
 
@@ -88,9 +74,24 @@ const deleteAll = function (req, res) {
   res.status(204).json();
 };
 
+/**
+ * Controller for an endpoint that returns the cached data for a given key
+ * @param req
+ * @param res
+ */
+const get = function (req, res) {
+  const key = req.params.key;
+
+  cache.getKey(key, function (err, value) {
+    res.json(value)
+  })
+
+};
+
 module.exports = {
   list: list,
   set: set,
   deleteKey: deleteKey,
-  deleteAll: deleteAll
+  deleteAll: deleteAll,
+  get: get
 };
