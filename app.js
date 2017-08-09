@@ -21,11 +21,4 @@ global.log = new(winston.Logger)({
 
 const port = config.get('port');
 
-try {
-  server.listen(port, function () {
-    console.info({ port: port }, 'Server started');
-  });
-} catch (err) {
-  console.error(err, 'Cannot start server.');
-  process.exit(1);
-}
+server.listen(port, () => console.info({ port: port }, 'Server started'));
