@@ -1,0 +1,32 @@
+{
+  "name": "cache-wrapper-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sorlandet/code-challenge-cache-api.git"
+  },
+  "author": "Evgeniy Medvedev",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sorlandet/code-challenge-cache-api/issues"
+  },
+  "homepage": "https://github.com/sorlandet/code-challenge-cache-api#readme",
+  "dependencies": {
+    "body-parser": "^1.17.2",
+    "config": "^1.26.1",
+    "debug": "^3.0.0",
+    "express": "^4.9.8",
+    "lodash": "^4.17.4",
+    "mongodb": "^2.2.31",
+    "winston": "^2.3.1"
+  },
+  "devDependencies": {
+    "chai": "^4.1.1",
+    "mocha": "^3.5.0"
+  },
+  "scripts": {
+    "test": "NODE_ENV=dev-test mocha -r ./test/specHelper.js -R spec test/unit/**/*-spec.js"
+  }
+}

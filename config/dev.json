@@ -1,0 +1,6 @@
+{
+  "cachingParams": {
+    "numberOfEntries": 10,
+    "ttl": 60
+  }
+}
